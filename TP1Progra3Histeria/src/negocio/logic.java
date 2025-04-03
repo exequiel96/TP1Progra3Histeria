@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import Interfaz.Interfaz;
@@ -19,11 +20,11 @@ public class logic {
 		this.intentos = 0;
 	}
 
-	public void escucharBoton(JButton jButton, JButton[][] botones, int fila, int col) {
+	public void escucharBoton(JButton jButton, JButton[][] botones, int fila, int col, JLabel intentos) {
 		jButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				contarIntentos();
+				contarIntentos(intentos);
 				Random random = new Random();
 				int r = random.nextInt(6);	
 				if(r == 0) {
@@ -56,17 +57,30 @@ public class logic {
 					if(esValido(jButton, botones, fila, col, color))
 						jButton.setBackground(Color.PINK);
 				}
-				
+				System.out.println(comprobarVictoria(botones));
 			}
+
+			
 
 				
 		});
 	}
 
 	
-
-	private void contarIntentos() {
+	private boolean comprobarVictoria(JButton[][] botones) {
+        for (int i = 0; i < botones.length; i++) {
+            for (int j = 0; j < botones[i].length; j++) {
+                Color colorFondo = botones[i][j].getBackground();
+                if (colorFondo.equals(Color.WHITE)) {
+                    return false;  // Detener y devolver false inmediatamente
+                }
+            }
+        }
+        return true;
+    }
+	private void contarIntentos(JLabel inten) {
 		this.intentos++;
+		actualizarIntentos(inten);
 	}
 
 	private boolean esValido(JButton jButton, JButton[][] botones, int fila, int col, Color color) {
@@ -149,7 +163,7 @@ public class logic {
 		return intentos;
 	}
 
-	public void actualizarIntentos(JTextField intentos) {
+	public void actualizarIntentos(JLabel intentos) {
 		intentos.setText(Integer.toString(this.intentos));
 	}
 

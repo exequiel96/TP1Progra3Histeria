@@ -27,7 +27,7 @@ public class Interfaz {
 
 	private JFrame frmHisteria;
 	private JButton [][] botones = new JButton [5][5];
-	private JTextField intentos;
+	private JLabel intentos;
 	private logic logic = new logic();
 
 	/**
@@ -72,11 +72,10 @@ public class Interfaz {
 		labelIntentos.setBounds(59, 22, 46, 14);
 		panelIzq.add(labelIntentos);
 		
-		intentos = new JTextField();
+		intentos = new JLabel();
 		intentos.setBounds(69, 47, 22, 20);
 		panelIzq.add(intentos);
 		intentos.setText(Integer.toString(logic.getIntentos()));
-		intentos.setColumns(10);
 		
 		JTextArea areaTextGanaste = new JTextArea();
 		areaTextGanaste.setBounds(25, 126, 116, 240);
@@ -85,17 +84,18 @@ public class Interfaz {
 		JPanel panelDer = new JPanel();
 		panelDer.setBounds(167, 0, 467, 410);
 		frmHisteria.getContentPane().add(panelDer);
-		panelDer.setLayout(new GridLayout(5,5));
+		panelDer.setLayout(new GridLayout(botones[0].length, botones[0].length));
+		
 		
 		
 		//agrego los botones a la grilla
-		for(int i = 0; i < 5; i++) {
-			for(int j = 0; j < 5; j++) {
+		for(int i = 0; i < botones[0].length; i++) {
+			for(int j = 0; j < botones[0].length; j++) {
 				JButton boton = new JButton();
 				boton.setBackground(Color.WHITE);
 				botones[i][j] = boton;
 				panelDer.add(boton);
-				logic.escucharBoton(botones[i][j], botones, i, j);
+				logic.escucharBoton(botones[i][j], botones, i, j, intentos);
 			}
 		}
 		
