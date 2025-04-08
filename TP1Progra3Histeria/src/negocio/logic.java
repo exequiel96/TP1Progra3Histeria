@@ -175,7 +175,7 @@ public class logic {
 	
 
 	public void mostrarVictoria(JButton[][] botones) {		
-		JOptionPane.showMessageDialog(null, "Has ganado el juego!", "Victoria", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(null, "Has ganado el juego!", "Ganador", JOptionPane.INFORMATION_MESSAGE);
 		apagarBotones(botones);
 	}
 
