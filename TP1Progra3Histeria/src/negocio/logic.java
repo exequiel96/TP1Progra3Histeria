@@ -3,81 +3,86 @@ package negocio;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 
 public class logic {
 	
 	private int intentos;
+	private Color color;
+	private JButton botonResaltado;
+	private int ayudas;
+	private String dificultad;
 	private int cuadrosPrendidos;
+	private int recordFacil;
+	private int recordNormal;
+	private int recordDificil;
 	
-	public logic () {
+	public logic (String dificultadElegida) {
 		this.intentos = 1;
+		Random random = new Random();
+		int r=random.nextInt(6);
+		randomizarColor(r);
+		this.dificultad=dificultadElegida;
+		if (dificultadElegida.equals("facil")) {
+            this.ayudas=2;
+        } else if (dificultadElegida.equals("normal")) {
+        	this.ayudas=4;
+        } else if (dificultadElegida.equals("dificil")) {
+        	this.ayudas=6;
+       
+        }
 		this.cuadrosPrendidos = 0;
+		this.recordFacil = leerRecordDesdeArchivo("recordfacil.txt");
+        this.recordNormal = leerRecordDesdeArchivo("recordnormal.txt");
+        this.recordDificil = leerRecordDesdeArchivo("recorddificil.txt");
 	}
-
-	public void escucharBoton(JButton jButton, JButton[][] botones, int fila, int col, JLabel intentos) {
+	
+	private int leerRecordDesdeArchivo(String nombreArchivo) {
+        try (BufferedReader br = new BufferedReader(new FileReader(nombreArchivo))) {
+            String linea = br.readLine();
+            return Integer.parseInt(linea);
+        } catch (Exception e) {
+            System.err.println("Error al leer " + nombreArchivo + ": " + e.getMessage());
+            return 0; // valor por defecto si hay error
+        }
+    }
+	
+	public void escucharBoton(JButton jButton, JButton[][] botones, int fila, int col, JLabel intentos, JLabel record) {
 		jButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				actualizarIntentos(intentos);
+				JButton botonAyuda=getBotonResaltado();
+				if(botonAyuda != null) {
+					botonAyuda.setBorder(UIManager.getBorder("Button.border"));
+				}
+				Color colorElegido = getColor();
+				if(esValido(jButton, botones, fila, col, colorElegido)) {
+					jButton.setBackground(colorElegido);
+					jButton.setEnabled(false);
+					actualizarBotonesPrendidos();
+				}
 				Random random = new Random();
-				int r = random.nextInt(6);	
-				if(r == 0) {
-					Color color = Color.BLACK;
-					if(esValido(jButton, botones, fila, col, color)) {
-						jButton.setBackground(Color.black);
-						jButton.setEnabled(false);
-						actualizarBotonesPrendidos();
-					}
-				}
-				if(r == 1) {
-					Color color = Color.BLUE;
-					if(esValido(jButton, botones, fila, col, color) ) {
-						jButton.setBackground(Color.blue);
-						jButton.setEnabled(false);
-						actualizarBotonesPrendidos();
-					}
-				}
-				if(r == 2) {
-					Color color = Color.RED;
-					if(esValido(jButton, botones, fila, col, color)) {
-						jButton.setBackground(Color.red);
-						jButton.setEnabled(false);
-						actualizarBotonesPrendidos();
-					}
-				}
-				if(r == 3) {
-					Color color = Color.YELLOW;
-					if(esValido(jButton, botones, fila, col, color)) {
-						jButton.setBackground(color);
-						jButton.setEnabled(false);
-						actualizarBotonesPrendidos();
-					}
-				}
-				if(r == 4) {
-					Color color = Color.GREEN;
-					if(esValido(jButton, botones, fila, col, color)) {
-						jButton.setBackground(Color.GREEN);
-						jButton.setEnabled(false);
-						actualizarBotonesPrendidos();
-					}
-				}
-				if(r == 5) {
-					Color color = Color.PINK;
-					if(esValido(jButton, botones, fila, col, color)) {
-						jButton.setBackground(Color.PINK);
-						jButton.setEnabled(false);
-						actualizarBotonesPrendidos();
-					}
-				}
-				consultarVictoria(botones, intentos);
+				int r=random.nextInt(6);
+				randomizarColor(r);
+				consultarVictoria(botones, intentos, record);
 			}
+
+			
+
+			
 		});
 	}
 
@@ -135,7 +140,27 @@ public class logic {
 		}
 		return checkVecinos(jButton, botonesVecinos, color);
 	}
-
+	private void randomizarColor(int r) {
+		if(r==0) {
+			this.color=Color.BLACK;
+		}
+		if(r==1) {
+			this.color=Color.BLUE;
+		}
+		if(r==2) {
+			this.color=Color.RED;
+		}
+		if(r==3) {
+			this.color=Color.YELLOW;
+		}
+		if(r==4) {
+			this.color=Color.GREEN;
+		}
+		if(r==5) {
+			this.color=Color.PINK;
+		}
+		
+	}
 	private boolean checkVecinos(JButton jButton, ArrayList<JButton> botonesVecinos, Color color) {
 		for(JButton b : botonesVecinos) {
 			if(color.equals(b.getBackground())){
@@ -162,6 +187,20 @@ public class logic {
 	public void apagarBotones(JButton[][] botones) {
 		this.intentos = 1;
 		this.cuadrosPrendidos = 0;
+		
+		if(this.dificultad.equals("facil")) {
+			this.ayudas=1;
+		}
+		if(this.dificultad.equals("normal")) {
+			this.ayudas=2;
+		}
+		if(this.dificultad.equals("dificil")) {
+			this.ayudas=3;
+		}
+		JButton botonAyuda=getBotonResaltado();
+		if(botonAyuda != null) {
+			botonAyuda.setBorder(UIManager.getBorder("Button.border"));
+		}
 		for(int i = 0; i < botones[0].length; i++) {
 			for(int j = 0; j < botones[0].length; j++) {
 				botones[i][j].setBackground(Color.WHITE);
@@ -178,17 +217,101 @@ public class logic {
 		this.cuadrosPrendidos++;
 	}
 
-	public void consultarVictoria(JButton[][] botones, JLabel intentos) {
-		if(this.cuadrosPrendidos == 25)
+	public void consultarVictoria(JButton[][] botones, JLabel intentos, JLabel record) {
+		int dificultad=botones[0].length*botones[0].length;
+		if(this.cuadrosPrendidos == dificultad) {
+			if(dificultad==25) {
+				if(this.recordFacil<dificultad || Integer.parseInt(intentos.getText()) < this.recordFacil) {
+					escribirRecordEnArchivo("recordfacil.txt",intentos.getText());
+					record.setText(intentos.getText());
+				}
+			}
+			else if(dificultad==36) {
+				if(this.recordNormal<dificultad || Integer.parseInt(intentos.getText()) < this.recordNormal) {
+					escribirRecordEnArchivo("recordnormal.txt",intentos.getText());
+					record.setText(intentos.getText());
+				}
+			}
+			else if(dificultad==49) {
+				if(this.recordDificil<dificultad || Integer.parseInt(intentos.getText()) < this.recordDificil) {
+					escribirRecordEnArchivo("recorddificil.txt",intentos.getText());
+					record.setText(intentos.getText());
+				}
+			}
 			mostrarVictoria(botones, intentos);	
+		}
 	}
 	
 
 	public void mostrarVictoria(JButton[][] botones, JLabel intentos) {		
 		JOptionPane.showMessageDialog(null, "Has ganado el juego!", "Victoria", JOptionPane.INFORMATION_MESSAGE);
-		String nombre = JOptionPane.showInputDialog(null, "Ingresa tu nombre:");
 		apagarBotones(botones);
 		intentos.setText(Integer.toString(0));
+	}
+	public int obtenerRecord(String dificultad) {
+		if (dificultad.equals("facil")) {
+            return this.recordFacil; 
+        } else if (dificultad.equals("normal")) {
+        	return this.recordNormal; 
+        } 
+        return this.recordDificil; 
+        
+	}
+	private void escribirRecordEnArchivo(String nombreArchivo, String contenido) {
+	    try (FileWriter fw = new FileWriter(nombreArchivo, false)) { 
+	        fw.write(contenido);
+	    } catch (Exception e) {
+	        System.err.println("Error al escribir en " + nombreArchivo + ": " + e.getMessage());
+	    }
+	}
+	public void sugerencia(JButton[][] botones, JButton sugerenciaBtn) {
+		if(this.ayudas>0) {
+			this.ayudas--;
+			sugerenciaBtn.setText("Ayuda ("+this.ayudas+")");
+			for(int i = 0; i < botones[0].length; i++) {
+				for(int j = 0; j < botones[0].length; j++) {
+					if (botones[i][j].getBackground().equals(Color.WHITE)) {
+						if (comprobarVecinos(botones, i, j)) {
+						    botones[i][j].setBorder(BorderFactory.createLineBorder(Color.YELLOW, 2));
+						    this.botonResaltado=botones[i][j];
+						    return;
+						}
+					}
+				}
+			}
+		}
+		return;
+		
+	}
+
+	private boolean comprobarVecinos(JButton[][] botones, int i, int j) {
+	    Color color = getColor(); 
+	    int filas = botones.length;
+	    int columnas = botones[0].length;
+
+	    if (i + 1 < filas && botones[i + 1][j] != null && botones[i + 1][j].getBackground().equals(color)) {
+	        return false;
+	    }
+	    if (j + 1 < columnas && botones[i][j + 1] != null && botones[i][j + 1].getBackground().equals(color)) {
+	        return false;
+	    }
+	    if (i - 1 >= 0 && botones[i - 1][j] != null && botones[i - 1][j].getBackground().equals(color)) {
+	        return false;
+	    }
+	    if (j - 1 >= 0 && botones[i][j - 1] != null && botones[i][j - 1].getBackground().equals(color)) {
+	        return false;
+	    }
+
+	    return true;
+	}
+	public int getAyudas() {
+		return this.ayudas;
+	}
+	private Color getColor() {
+		return this.color;
+	}
+	private JButton getBotonResaltado() {
+		return this.botonResaltado;
 	}
 
 

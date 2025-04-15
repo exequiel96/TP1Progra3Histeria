@@ -30,9 +30,9 @@ public class Menu {
         frameMenu.setVisible(true);
     }
 
-    // Método para mostrar las opciones de dificultad
+
     private void mostrarSeleccionDificultad() {
-        String[] opcionesDificultad = { "Fácil", "Normal", "Difícil" };
+        String[] opcionesDificultad = { "facil", "normal", "dificil" };
         String seleccion = (String) JOptionPane.showInputDialog(
                 frameMenu, 
                 "Selecciona la dificultad", 
@@ -40,29 +40,28 @@ public class Menu {
                 JOptionPane.QUESTION_MESSAGE, 
                 null, 
                 opcionesDificultad, 
-                opcionesDificultad[1]);
+                opcionesDificultad[0]);
 
         if (seleccion != null && !seleccion.isEmpty()) {
             abrirJuego(seleccion);
         }
     }
 
-    // Abre el juego con la dificultad seleccionada
+
     private void abrirJuego(String dificultad) {
-        // Abre la interfaz de juego pasando la dificultad seleccionada
         Interfaz interfazJuego = new Interfaz(dificultad);
         interfazJuego.getFrmHisteria().setVisible(true);
-        frameMenu.setVisible(false);  // Cierra el menú
+        frameMenu.setVisible(false);
     }
 
-    // Método principal (main) para iniciar la aplicación con el menú
+
     public static void main(String[] args) {
-        // Crear el objeto del menú y mostrarlo
+
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    Menu menu = new Menu();  // Crear una instancia del menú
-                    menu.mostrarMenu();  // Mostrar el menú
+                    Menu menu = new Menu(); 
+                    menu.mostrarMenu();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
