@@ -10,6 +10,7 @@ import negocio.logic;
 public class Interfaz {
 
     private JFrame frmHisteria;
+    private int tamanioMatriz;
     private JButton[][] botones;
     private JLabel intentos;
     private JLabel record;
@@ -60,7 +61,8 @@ public class Interfaz {
         frmHisteria.getContentPane().add(panelDer);
 
         // Configurar el tamaño de la matriz de botones según la dificultad
-        configurarDificultad();
+        this.tamanioMatriz=logic.configurarDificultad(this.dificultad);
+        botones = new JButton[this.tamanioMatriz][this.tamanioMatriz];
 
         // Ajustar el GridLayout según el tamaño de la matriz de botones
         panelDer.setLayout(new GridLayout(botones.length, botones[0].length));
@@ -115,17 +117,4 @@ public class Interfaz {
         }
     }
 
-    private void configurarDificultad() {
-        int size = 0;
-
-        if (dificultad.equals("facil")) {
-            size = 5;  
-        } else if (dificultad.equals("normal")) {
-            size = 6;  
-        } else if (dificultad.equals("dificil")) {
-            size = 7; 
-        }
-
-        botones = new JButton[size][size];
-    }
 }

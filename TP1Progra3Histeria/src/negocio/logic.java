@@ -31,9 +31,8 @@ public class logic {
 	
 	public logic (String dificultadElegida) {
 		this.intentos = 1;
-		Random random = new Random();
-		int r=random.nextInt(6);
-		randomizarColor(r);
+		
+		randomizarColor();
 		this.dificultad=dificultadElegida;
 		if (dificultadElegida.equals("facil")) {
             this.ayudas=2;
@@ -74,9 +73,7 @@ public class logic {
 					jButton.setEnabled(false);
 					actualizarBotonesPrendidos();
 				}
-				Random random = new Random();
-				int r=random.nextInt(6);
-				randomizarColor(r);
+				randomizarColor();
 				consultarVictoria(botones, intentos, record);
 			}
 
@@ -140,7 +137,9 @@ public class logic {
 		}
 		return checkVecinos(jButton, botonesVecinos, color);
 	}
-	private void randomizarColor(int r) {
+	private void randomizarColor() {
+		Random random = new Random();
+		int r=random.nextInt(6);
 		if(r==0) {
 			this.color=Color.BLACK;
 		}
@@ -189,13 +188,13 @@ public class logic {
 		this.cuadrosPrendidos = 0;
 		
 		if(this.dificultad.equals("facil")) {
-			this.ayudas=1;
-		}
-		if(this.dificultad.equals("normal")) {
 			this.ayudas=2;
 		}
+		if(this.dificultad.equals("normal")) {
+			this.ayudas=4;
+		}
 		if(this.dificultad.equals("dificil")) {
-			this.ayudas=3;
+			this.ayudas=6;
 		}
 		JButton botonAyuda=getBotonResaltado();
 		if(botonAyuda != null) {
@@ -222,18 +221,21 @@ public class logic {
 		if(this.cuadrosPrendidos == dificultad) {
 			if(dificultad==25) {
 				if(this.recordFacil<dificultad || Integer.parseInt(intentos.getText()) < this.recordFacil) {
+					this.recordFacil=Integer.parseInt(intentos.getText());
 					escribirRecordEnArchivo("recordfacil.txt",intentos.getText());
 					record.setText(intentos.getText());
 				}
 			}
 			else if(dificultad==36) {
 				if(this.recordNormal<dificultad || Integer.parseInt(intentos.getText()) < this.recordNormal) {
+					this.recordNormal=Integer.parseInt(intentos.getText());
 					escribirRecordEnArchivo("recordnormal.txt",intentos.getText());
 					record.setText(intentos.getText());
 				}
 			}
 			else if(dificultad==49) {
 				if(this.recordDificil<dificultad || Integer.parseInt(intentos.getText()) < this.recordDificil) {
+					this.recordDificil=Integer.parseInt(intentos.getText());
 					escribirRecordEnArchivo("recorddificil.txt",intentos.getText());
 					record.setText(intentos.getText());
 				}
@@ -312,6 +314,16 @@ public class logic {
 	}
 	private JButton getBotonResaltado() {
 		return this.botonResaltado;
+	}
+
+	public int configurarDificultad(String dificultadElegida) {
+		if (dificultadElegida.equals("facil")) {
+            return 5;  
+        } else if (dificultadElegida.equals("normal")) {
+            return 6;  
+        } else {
+            return 7; 
+        }
 	}
 
 
